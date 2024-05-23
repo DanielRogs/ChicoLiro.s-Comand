@@ -27,6 +27,6 @@ body:
     id: text-zone3
     attributes:
       label: Detalhes adicionais?
-      description: O que deve ser testado e estando funcionando para que se conclua a atividade?
+      description: Escreve se houver detalhes necessários de estar à conhecimento de todos.
       placeholder: |
         Escreva ou deixe em branco.
