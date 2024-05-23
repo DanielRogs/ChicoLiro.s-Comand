@@ -1,0 +1,33 @@
+name: New User Story
+description: Register a new User Story in the ChicoLiro Project
+tittle: "[US <Código da US>]: <Título da US no verbo Infinitivo>"
+labels: ["US"]
+projects: ["pi1-2024-ChicoLiro/ChicoLiro-Board"]
+body:
+  - type: textarea
+    id: text-zone1
+    attributes:
+      label: Descreva a História de Usuário
+      description: siga o modelo - Quem deve operar o sistema? O que deve sistema deve fazer? Para qual objetivo o ator deve fazer isso?
+      value: O || Eu como <Ator da Ação>, deve ser capaz de <o que deve fazer>, para que <Objetivo>.
+      validations:
+        required: true
+  - type: textarea
+    id: text-zone2
+    attributes:
+      label: Quais são os Critérios de Aceitação?
+      description: O que deve ser testado e estando funcionando para que se conclúa a atividade?
+      value: |
+        - [ ] Critério 1;
+        - [ ] Critério 2;
+        - [ ] Critério 3.
+      reder: markdown
+      validations:
+        required: true
+  - type: textarea
+    id: text-zone3
+    attributes:
+      label: Detalhes adicionais?
+      description: O que deve ser testado e estando funcionando para que se conclua a atividade?
+      placeholder: |
+        Escreva ou deixe em branco.
