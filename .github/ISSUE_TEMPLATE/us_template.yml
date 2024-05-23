@@ -1,6 +1,6 @@
 name: New User Story
 description: Register a new User Story in the ChicoLiro Project
-tittle: "[US <Código da US>]: <Título da US no verbo Infinitivo>"
+title: "[US <Código da US>]: <Título da US no verbo Infinitivo>"
 labels: ["US"]
 projects: ["pi1-2024-ChicoLiro/ChicoLiro-Board"]
 body:
@@ -10,8 +10,7 @@ body:
       label: Descreva a História de Usuário
       description: siga o modelo - Quem deve operar o sistema? O que deve sistema deve fazer? Para qual objetivo o ator deve fazer isso?
       value: O || Eu como <Ator da Ação>, deve ser capaz de <o que deve fazer>, para que <Objetivo>.
-      validations:
-        required: true
+      required: true
   - type: textarea
     id: text-zone2
     attributes:
@@ -22,8 +21,7 @@ body:
         - [ ] Critério 2;
         - [ ] Critério 3.
       reder: markdown
-      validations:
-        required: true
+      required: true
   - type: textarea
     id: text-zone3
     attributes:
