@@ -10,6 +10,7 @@ body:
       label: Descreva a História de Usuário
       description: siga o modelo - Quem deve operar o sistema? O que deve sistema deve fazer? Para qual objetivo o ator deve fazer isso?
       value: O || Eu como <Ator da Ação>, deve ser capaz de <o que deve fazer>, para que <Objetivo>.
+    validations:
       required: true
   - type: textarea
     id: text-zone2
@@ -20,7 +21,7 @@ body:
         - [ ] Critério 1;
         - [ ] Critério 2;
         - [ ] Critério 3.
-      reder: markdown
+    validations:
       required: true
   - type: textarea
     id: text-zone3
