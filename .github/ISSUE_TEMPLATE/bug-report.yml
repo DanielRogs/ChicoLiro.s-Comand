@@ -32,6 +32,7 @@ body:
         Arquivo: Pasta/Pasta/nomeArquivo.js
         __
         Cole o código aqui
+      render: c++
   - type: textarea
     id: text-zone4
     attributes:
