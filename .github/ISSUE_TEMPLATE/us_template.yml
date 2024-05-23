@@ -21,7 +21,6 @@ body:
         - [ ] Critério 1;
         - [ ] Critério 2;
         - [ ] Critério 3.
-      render: markdown
     validations:
       required: true
   - type: textarea
