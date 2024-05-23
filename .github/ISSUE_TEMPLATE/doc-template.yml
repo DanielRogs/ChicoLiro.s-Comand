@@ -1,0 +1,20 @@
+name: New Documentation
+description: Register a Documentation in the ChicoLiro Project
+title: "[DOC]: <Título da Documentação>"
+labels: ["DOC"]
+projects: ["pi1-2024-ChicoLiro/ChicoLiro-Board"]
+body:
+  - type: textarea
+    id: text-zone1
+    attributes:
+      label: Descreva o que deve ser feito nesta seção da documentação.
+      description: Descreva aqui os detalhes do que deve estar escrito na documentação.
+    validations:
+      required: true
+  - type: textarea
+    id: text-zone3
+    attributes:
+      label: Detalhes adicionais?
+      description: Escreve se houver detalhes necessários de estar à conhecimento de todos.
+      placeholder: |
+        Escreva ou deixe em branco.
