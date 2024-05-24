@@ -9,7 +9,7 @@
 <!--- Se está corrigindo um _bug_, deve haver uma _issue_ descrevendo-o com passos para reproduzir. -->
 <!--- Por favor, adicione o link para a _issue_ aqui: -->
 <!--- #nome_da_issue: -->
-
+closes #<APAGUE E COLOQUE A # DA ISSUE DA FUNCIONALIDADE>
 
 ## Como Isso Foi Testado?
 <!--- Por favor, descreva detalhadamente como você testou suas mudanças. -->
