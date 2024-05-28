@@ -1,18 +1,36 @@
-#define pinSensor 15 // Deve estar de acordo com o pino de output
+#include <Arduino.h>
+#define pinSensorMeio 15 // Deve estar de acordo com o pino de output
+#define pinSensorEsq 14 // Sensor da Esquerda
+#define pinSensorDir 12 // Sensor da direita
+
 
 void setup() {
-  pinMode(pinSensor, INPUT);
-  // Configuração da taxa de comunicação em bits por segundo (baud rate)
-  Serial.begin(115200); //Se for omitido esse parâmetro o padrão será 8 bits, sem paridade e 1 stop bit.
+  pinMode(pinSensorMeio, INPUT);
+  pinMode(pinSensorEsq, INPUT);
+  pinMode(pinSensorDir, INPUT);
+  Serial.begin(9600); // Configuração da taxa de comunicação em bits por segundo (baud rate)
 }
 
 void loop() {
-
-  if (digitalRead(pinSensor) == HIGH) {
-    Serial.println("Está na fita"); // Pode testar falso positivo se estiver longe de uma superfície.
+  // Se detectar no do meio e os da esquerda e direita não, segue reto
+  if (digitalRead(pinSensorMeio) == HIGH && digitalRead(pinSensorEsq) == LOW && digitalRead(pinSensorDir) == LOW) {  
+    Serial.println("Reta");
   }
+  // Se detectar na esquerda e não na direita, vire a esquerda
+  else if (digitalRead(digitalRead(pinSensorEsq) == HIGH && digitalRead(pinSensorDir) == LOW)) {
+    Serial.println("Virar a Esquerda");
+  }
+  // Se detectar na direita e não na esquerda, vire a direita
+  else if (digitalRead(digitalRead(pinSensorEsq) == LOW && digitalRead(pinSensorDir) == HIGH)) {
+    Serial.println("Virar a Direita");
+  }
+  // Caso todos os pinos estejam ativos, fim do percurso
+  else if (digitalRead(pinSensorMeio) == HIGH && digitalRead(pinSensorEsq) == HIGH && digitalRead(pinSensorDir) == HIGH) {
+    Serial.println("Fim do Percurso");
+  }
+  // Linha não detectada
   else{
-    Serial.println("Não está na fita");
+    Serial.println("Não detectado");
   }
   delay(200);
 
