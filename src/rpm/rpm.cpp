@@ -9,9 +9,13 @@ unsigned long timeold;
 // Alterar o número de acordo com o disco do encoder 
 unsigned int pulsos_por_volta = 13;
 
+// Pinos de entrada para os sinais do encoder
+const int pinA = 2;
+const int pinB = 3;
+
 // -- Interrupção --
 
-void contador ()
+void contador()
 {
     // Incrementa o contador de pulsos
     pulsos++;
@@ -23,9 +27,13 @@ void setup()
 {
     Serial.begin(115200); // Inicializa a comunicação serial com a taxa de transmissão de 115200 bps
     
-    // Configura a interrupção para ocorrer no pino digital 2 (GPIO2 no ESP32)
+    // Configura os pinos como entradas
+    pinMode(pinA, INPUT);
+    pinMode(pinB, INPUT);
+    
+    // Configura a interrupção para ocorrer no pino digital 2 (pinA)
     // Aciona a função contador() a cada borda de subida (RISING)
-    attachInterrupt(digitalPinToInterrupt(2), contador, RISING);
+    attachInterrupt(digitalPinToInterrupt(pinA), contador, RISING);
     
     pulsos = 0; // Inicializa a contagem de pulsos
     rpm = 0; // Inicializa a variável de rotação por minuto
