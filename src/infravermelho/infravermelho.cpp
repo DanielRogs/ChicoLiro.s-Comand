@@ -12,27 +12,26 @@ void setup() {
 }
 
 void loop() {
-  // Se detectar no do meio e os da esquerda e direita não, segue reto
-  if (digitalRead(pinSensorMeio) == HIGH && digitalRead(pinSensorEsq) == LOW && digitalRead(pinSensorDir) == LOW) {  
+  // Ler todos os sensores uma única vez
+  bool sensorMeio = digitalRead(pinSensorMeio);
+  bool sensorEsq = digitalRead(pinSensorEsq);
+  bool sensorDir = digitalRead(pinSensorDir);
+
+  if (sensorMeio && !sensorEsq && !sensorDir) {
     Serial.println("Reta");
   }
-  // Se detectar na esquerda e não na direita, vire a esquerda
-  else if (digitalRead(digitalRead(pinSensorEsq) == HIGH && digitalRead(pinSensorDir) == LOW)) {
+  else if (sensorEsq && !sensorDir) {
     Serial.println("Virar a Esquerda");
   }
-  // Se detectar na direita e não na esquerda, vire a direita
-  else if (digitalRead(digitalRead(pinSensorEsq) == LOW && digitalRead(pinSensorDir) == HIGH)) {
+  else if (!sensorEsq && sensorDir) {
     Serial.println("Virar a Direita");
   }
-  // Caso todos os pinos estejam ativos, fim do percurso
-  else if (digitalRead(pinSensorMeio) == HIGH && digitalRead(pinSensorEsq) == HIGH && digitalRead(pinSensorDir) == HIGH) {
+  else if (sensorMeio && sensorEsq && sensorDir) {
     Serial.println("Fim do Percurso");
   }
-  // Linha não detectada
-  else{
+  else {
     Serial.println("Não detectado");
   }
-  delay(200);
 
 
   // int valorAnalogico = analogRead(pinSensor);
