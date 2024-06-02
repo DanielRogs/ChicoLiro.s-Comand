@@ -4,6 +4,7 @@
 volatile int cont = 0; 
 volatile float rpm = 0;
 float oscilacoes_disco = 40; // 20 "paredes" e 20 "buracos"
+void interrupcao();
 
 void setup() {
   pinMode(pinEncoder, INPUT);
