@@ -1,64 +1,79 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WebSocketsClient.h>
+#include <ESPAsyncWebServer.h>
+#include <HTTPClient.h>
 
-// Defina as credenciais do WiFi
-char* ssid = "Wokwi-GUEST";
-char* password = "";
+// Defina suas credenciais WiFi
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
 
-// Defina o endereço do servidor WebSocket e a porta
-const char* websocket_server = "chicoliro.xobengala.com.br";
-const uint16_t websocket_port = 3005; // Ajuste para a porta do seu servidor
-const char* websocket_path = "/socket.io/"; // Path para o Socket.IO
+// Defina o URL do servidor para onde os dados serão enviados
+const char* serverUrl = "http://chicoliro.xobengala.com.br/api/dados/receive-data";
 
-// Instancie o cliente WebSocket
-WebSocketsClient webSocket;
+// Crie uma instância do servidor
+AsyncWebServer server(80);
 
-// Função de callback para eventos do WebSocket
-void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
-    switch(type) {
-        case WStype_DISCONNECTED:
-            Serial.println("WebSocket Disconnected");
-            break;
-        case WStype_CONNECTED:
-            Serial.println("WebSocket Connected");
-            // Enviar uma mensagem ao conectar
-            webSocket.sendTXT("{"event":"receive-data", "data":"Hello Server"}");
-            break;
-        case WStype_TEXT:
-            Serial.printf("Received Text: %s\n", payload);
-            break;
-        case WStype_BIN:
-            Serial.println("Received Binary");
-            break;
-    }
+// Variáveis para armazenar os dados dos sensores
+volatile int rpmMotorDireito = 0;
+volatile int rpmMotorEsquerdo = 0;
+String flag = "Largada";
+
+// Função Exemplo para ler os sensores e calcular as RPMs
+void lerSensores() {
+    // Substitua essas linhas com a lógica real para ler os sensores
+    rpmMotorDireito = 100;
+    rpmMotorEsquerdo = 100;
+    flag = "Teste";
 }
+
+// Função para enviar os dados para a API REST
+void enviarDados() {
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+
+    String jsonData = "{\"rpmMotorDir\": " + String(rpmMotorDireito) +
+                      ", \"rpmMotorEsq\": " + String(rpmMotorEsquerdo) +
+                      ", \"flag\": " + String(flag) + "}";
+
+    int httpResponseCode = http.POST(jsonData);
+    Serial.println(httpResponseCode);
+
+    if (httpResponseCode >= 200 && httpResponseCode < 400) {
+        Serial.println("Dados enviados com sucesso");
+    } else {
+        Serial.println("Falha ao enviar dados");
+    }
+
+    http.end();
+}
+
+// Configuração inicial
 void setup() {
     Serial.begin(115200);
 
-    // Conectar ao WiFi
+    // Conecte-se ao WiFi
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
+        delay(1000);
+        Serial.println("Conectando ao WiFi...");
     }
-    Serial.println("WiFi Connected");
+    Serial.println("Conectado ao WiFi");
 
-    // Configurar o WebSocket
+    // Inicie o servidor
+    server.begin();
 
-    // String url = String("https://"/) + websocket_server + ":" + websocket_port + websocket_path;
-    webSocket.begin(websocket_server, websocket_port, websocket_path);
-    webSocket.onEvent(webSocketEvent);
+    // Configure o temporizador para enviar dados a cada 1 segundo
+    xTaskCreate([](void*){
+        for (;;) {
+            lerSensores();
+            enviarDados();
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+    }, "EnviarDadosTask", 4096, NULL, 1, NULL);
 }
 
+// Loop principal
 void loop() {
-    // Chamar o loop do WebSocket para manter a conexão
-    webSocket.loop();
-
-    // Exemplo de envio de dados periodicamente
-    static unsigned long lastTime = 0;
-    if (millis() - lastTime > 2000) { // A cada 2 segundos
-        lastTime = millis();
-        webSocket.sendTXT("{"event":"receive-data", "data":"Hello from ESP32"}");
-    }
+    // Nada a fazer aqui, tudo está sendo feito na tarefa
 }
