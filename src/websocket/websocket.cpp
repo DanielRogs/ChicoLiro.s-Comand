@@ -8,7 +8,7 @@ const char* ssid = "Wokwi-GUEST";
 const char* password = "";
 
 // Defina o URL do servidor para onde os dados serão enviados
-const char* serverUrl = "http://chicoliro.xobengala.com.br/api/dados/receive-data";
+const char* serverUrl = "https://chicoliro.xobengala.com.br/api/dados/receive-data";
 
 // Crie uma instância do servidor
 AsyncWebServer server(80);
@@ -16,14 +16,16 @@ AsyncWebServer server(80);
 // Variáveis para armazenar os dados dos sensores
 volatile int rpmMotorDireito = 0;
 volatile int rpmMotorEsquerdo = 0;
-String flag = "Largada";
+volatile int tensao = 0;
+volatile bool isMoving = false;
 
 // Função Exemplo para ler os sensores e calcular as RPMs
 void lerSensores() {
     // Substitua essas linhas com a lógica real para ler os sensores
     rpmMotorDireito = 100;
     rpmMotorEsquerdo = 100;
-    flag = "Teste";
+    isMoving = true;
+    tensao = 9;
 }
 
 // Função para enviar os dados para a API REST
@@ -31,12 +33,14 @@ void enviarDados() {
     HTTPClient http;
     http.begin(serverUrl);
     http.addHeader("Content-Type", "application/json");
-
+    
     String jsonData = "{\"rpmMotorDir\": " + String(rpmMotorDireito) +
                       ", \"rpmMotorEsq\": " + String(rpmMotorEsquerdo) +
-                      ", \"flag\": " + String(flag) + "}";
+                      ", \"tensao\": " + String(tensao) +
+                      ", \"isMoving\": " + String(isMoving) + "}"; 
 
     int httpResponseCode = http.POST(jsonData);
+    Serial.println(jsonData);
     Serial.println(httpResponseCode);
 
     if (httpResponseCode >= 200 && httpResponseCode < 400) {
