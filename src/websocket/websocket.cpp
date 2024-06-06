@@ -2,15 +2,15 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <HTTPClient.h>
+#include "config.h"
 
-// Defina suas credenciais WiFi
-const char* ssid = "Wokwi-GUEST";
-const char* password = "";
+// Definindo as credenciais WiFi
+const char* ssid = "UNB Wireless";
 
-// Defina o URL do servidor para onde os dados serão enviados
+// Definindo o URL do servidor para onde os dados serão enviados
 const char* serverUrl = "https://chicoliro.xobengala.com.br/api/dados/receive-data";
 
-// Crie uma instância do servidor
+// Criando uma instância do servidor
 AsyncWebServer server(80);
 
 // Variáveis para armazenar os dados dos sensores
@@ -21,7 +21,6 @@ volatile bool isMoving = false;
 
 // Função Exemplo para ler os sensores e calcular as RPMs
 void lerSensores() {
-    // Substitua essas linhas com a lógica real para ler os sensores
     rpmMotorDireito = 100;
     rpmMotorEsquerdo = 100;
     isMoving = true;
@@ -57,7 +56,7 @@ void setup() {
     Serial.begin(115200);
 
     // Conecte-se ao WiFi
-    WiFi.begin(ssid, password);
+    WiFi.begin(ssid, wifi_username, wifi_password);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
         Serial.println("Conectando ao WiFi...");
