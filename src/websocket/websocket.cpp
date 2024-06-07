@@ -1,67 +1,81 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncTCP.h>
+#include <HTTPClient.h>
+#include "config.h"
 
-// Configurações da rede Wi-Fi
-const char* ssid = "SEU_SSID"; // Nome da rede
-const char* password = "SUA_SENHA"; // Senha da rede
+// Definindo as credenciais WiFi
+const char* ssid = "UNB Wireless";
 
-// Criação do servidor e do WebSocket
-AsyncWebServer server(80); // Porta para o WS
-AsyncWebSocket ws("/ws");
+// Definindo o URL do servidor para onde os dados serão enviados
+const char* serverUrl = "https://chicoliro.xobengala.com.br/api/dados/receive-data";
 
-int RPM = 100; // Exemplo de RPM
+// Criando uma instância do servidor
+AsyncWebServer server(80);
 
-// Função para enviar dados dos sensores
-void sendSensorData() {
-    String sensorData = "{\"RPM\": %d}", RPM; // Exemplo de dados dos sensores
-    ws.textAll(sensorData);
+// Variáveis para armazenar os dados dos sensores
+volatile int rpmMotorDireito = 0;
+volatile int rpmMotorEsquerdo = 0;
+volatile int tensao = 0;
+volatile bool isMoving = false;
+
+// Função Exemplo para ler os sensores e calcular as RPMs
+void lerSensores() {
+    rpmMotorDireito = 100;
+    rpmMotorEsquerdo = 100;
+    isMoving = true;
+    tensao = 9;
 }
 
-void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
-             void *arg, uint8_t *data, size_t len) {
-  if (type == WS_EVT_CONNECT) {
-    Serial.printf("Cliente conectado %u\n", client->id());
-  } else if (type == WS_EVT_DISCONNECT) {
-    Serial.printf("Cliente desconectado %u\n", client->id());
-  } else if (type == WS_EVT_DATA) {
-    // Tratar dados recebidos do cliente, se necessário
-  }
-}
+// Função para enviar os dados para a API REST
+void enviarDados() {
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+    
+    String jsonData = "{\"rpmMotorDir\": " + String(rpmMotorDireito) +
+                      ", \"rpmMotorEsq\": " + String(rpmMotorEsquerdo) +
+                      ", \"tensao\": " + String(tensao) +
+                      ", \"isMoving\": " + String(isMoving) + "}"; 
 
-void setup() {
-  // Inicialização serial
-  Serial.begin(115200);
+    int httpResponseCode = http.POST(jsonData);
+    Serial.println(jsonData);
+    Serial.println(httpResponseCode);
 
-  // Conexão à rede Wi-Fi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Conectando à rede Wi-Fi...");
-  }
-  Serial.println("Conectado à rede Wi-Fi");
-
-  // Configuração do WebSocket
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
-
-  // Inicia o servidor
-  server.begin();
-
-  // Exemplo de envio periódico de dados dos sensores
-  TimerHandle_t sensorDataTimer = xTimerCreate(
-    "SensorDataTimer",
-    pdMS_TO_TICKS(1000), // Enviar dados a cada 1 segundo
-    pdTRUE,
-    (void*)0,
-    [](TimerHandle_t xTimer) {
-      sendSensorData();
+    if (httpResponseCode >= 200 && httpResponseCode < 400) {
+        Serial.println("Dados enviados com sucesso");
+    } else {
+        Serial.println("Falha ao enviar dados");
     }
-  );
-  xTimerStart(sensorDataTimer, 0);
+
+    http.end();
 }
 
+// Configuração inicial
+void setup() {
+    Serial.begin(115200);
+
+    // Conecte-se ao WiFi
+    WiFi.begin(ssid, wifi_username, wifi_password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        Serial.println("Conectando ao WiFi...");
+    }
+    Serial.println("Conectado ao WiFi");
+
+    // Inicie o servidor
+    server.begin();
+
+    xTaskCreate([](void*){
+        for (;;) {
+            lerSensores();
+            enviarDados();
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+        }
+    }, "EnviarDadosTask", 4096, NULL, 1, NULL);
+}
+
+// Loop principal
 void loop() {
-  // O loop pode estar vazio, pois o envio de dados é tratado pelo Timer
+    // Nada a fazer aqui, tudo está sendo feito na tarefa
 }
