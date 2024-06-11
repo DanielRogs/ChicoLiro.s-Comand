@@ -6,6 +6,7 @@
 
 // Definindo as credenciais WiFi
 const char* ssid = "UNB Wireless";
+const char* wifi_password = "SenhaAqui";
 
 // Definindo o URL do servidor para onde os dados serão enviados
 const char* serverUrl = "https://chicoliro.xobengala.com.br/api/dados/receive-data";
@@ -56,7 +57,7 @@ void setup() {
     Serial.begin(115200);
 
     // Conecte-se ao WiFi
-    WiFi.begin(ssid, wifi_username, wifi_password);
+    WiFi.begin(ssid, wifi_password);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
         Serial.println("Conectando ao WiFi...");
