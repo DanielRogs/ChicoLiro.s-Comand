@@ -71,8 +71,8 @@ float calcularErro(int sensorEsq, int sensorMeio, int sensorDir) {
 }
 
 void controlarMotor(int PID) {
-  int velocidadeBase = 100;  // Velocidade base dos motores (ajustável)
-  int velocidadeMax = 255;   // Valor máximo para PWM (assumindo que 255 é o máximo)
+  int velocidadeBase = 50;  // Velocidade base dos motores - AJUSTE SE NECESSÁRIO
+  int velocidadeMax = 100;   // Valor máximo para PWM - CHECAR
 
   // Cálculo da velocidade dos motores ajustando pelo PID
   int velocidadeEsq = velocidadeBase + PID;
