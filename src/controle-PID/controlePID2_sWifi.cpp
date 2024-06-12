@@ -14,11 +14,11 @@ const int pinSensorEsq = 15;
 const int pinSensorMeio = 2;
 const int pinSensorDir = 4;
 
-const int pinEncoderEsq = 5;  // Defina os pinos corretos dos encoders
-const int pinEncoderDir = 6;
+const int pinEncoderEsq = 5;  // ARRUMAR PINO
+const int pinEncoderDir = 6;  // ARRUMAR PINO
 
-const int pinMotorEsq = 9;    // Defina os pinos corretos dos motores
-const int pinMotorDir = 10;
+const int pinMotorEsq = 9;  // ARRUMAR PINO
+const int pinMotorDir = 10; // ARRUMAR PINO
 
 // Variáveis para leitura dos sensores
 int sensorEsq;
@@ -63,8 +63,8 @@ float calcularErro(int sensorEsq, int sensorMeio, int sensorDir) {
 }
 
 void controlarMotor(int PID) {
-  int velocidadeBase = 50;  // Velocidade base dos motores (ajustável)
-  int velocidadeMax = 100;   // Valor máximo para PWM (assumindo que 255 é o máximo)
+  int velocidadeBase = 50;  // Velocidade base dos motores (ajuste, caso necessário)
+  int velocidadeMax = 100;   // Valor máximo para PWM
 
   // Cálculo da velocidade dos motores ajustando pelo PID
   int velocidadeEsq = velocidadeBase + PID;
