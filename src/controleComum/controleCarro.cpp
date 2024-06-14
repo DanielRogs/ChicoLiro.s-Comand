@@ -1,3 +1,12 @@
+/*
+
+  Título: Código sem PID da equipe de Software.
+  Autores: Daniel Rodrigues e Leandro Almeida.
+  Descrição: Código para integrar todo o sistema controlador do carro.
+  Data de criação: 13/06/2024
+
+*/
+
 #include <Arduino.h>
 
 // Pinos dos sensores infravermelhos
@@ -6,16 +15,18 @@
 #define pinSensorDir 12
 
 // Pinos dos motores
-#define IN1 9
-#define IN2 8
-#define EN_A 10
-#define IN3 5
-#define IN4 4
-#define EN_B 3
+// MOTOR A
+#define IN1 9 // CORRIGIR
+#define IN2 8 // CORRIGIR
+#define EN_A 10 // CORRIGIR
+// MOTOR B
+#define IN3 5 // CORRIGIR
+#define IN4 4 // CORRIGIR
+#define EN_B 3 // CORRIGIR
 
 // Pinos dos encoders
-const byte MOTOR_A = 15;
-const byte MOTOR_B = 3;
+const byte MOTOR_A = 15; // CORRIGIR
+const byte MOTOR_B = 3; // CORRIGIR
 
 // Variáveis para contagem de pulsos
 volatile int counter_A = 0;

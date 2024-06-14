@@ -16,13 +16,13 @@
 
 // Pinos dos motores
 // MOTOR A
-#define IN1 9
-#define IN2 8
-#define EN_A 10
+#define IN1 9 // CORRIGIR
+#define IN2 8 // CORRIGIR
+#define EN_A 10 // CORRIGIR
 // MOTOR B
-#define IN3 5
-#define IN4 4
-#define EN_B 3
+#define IN3 5 // CORRIGIR
+#define IN4 4 // CORRIGIR
+#define EN_B 3 // CORRIGIR
 
 // Pinos dos encoders
 const byte MOTOR_A = 15; // CORRIGIR
