@@ -41,7 +41,7 @@ float Kp = 2.0;
 float Ki = 5.0;
 float Kd = 1.0;
 float error = 0, previous_error = 0, integral = 0, derivative = 0;
-float baseSpeed = 100;
+float baseSpeed = 50;
 float correction = 0;
 
 // Função para calcular RPM e velocidade
@@ -117,8 +117,8 @@ void loop() {
     int speedB = baseSpeed - correction;
 
     // Limitar a velocidade dos motores
-    speedA = constrain(speedA, 0, 255);
-    speedB = constrain(speedB, 0, 255);
+    speedA = constrain(speedA, 0, 100);
+    speedB = constrain(speedB, 0, 100);
 
     // Definir direção e velocidade dos motores
     if (speedA >= 0) {
