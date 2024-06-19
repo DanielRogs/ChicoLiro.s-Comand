@@ -16,7 +16,7 @@
 #define EN_A 13 // Os pinos com o prefixo "EN" são pinos da Ponte H que vão determinar quanto de tensão os motores irão receber, assim determi-
                 // nando a velocidade com a qual eles vão girar. Esses pinos irão receber um sinal PWM, que é um sinal digital que emula um
                 // sinal analógico
-                
+     
 // Motor B
 #define IN3 27
 #define IN4 26
@@ -30,8 +30,8 @@
 // Variáveis de controle de velocidade
 const int velocidadeBase = 80; // Velocidade base dos motores
 const int velocidadeMaxima = 100; // Velocidade máxima dos motores
-const int ajusteVelocidade = 10; // Ajuste de velocidade para correções
-const int limitePreto = 80; // Valor limite para detectar a linha preta (ajuste conforme necessário)
+const int ajusteVelocidade = 5; // Ajuste de velocidade para correções
+const int limitePreto = 90; // Valor limite para detectar a linha preta (ajuste conforme necessário)
 
 void setup() {
   // Configuração dos pinos dos motores
@@ -73,19 +73,19 @@ void loop() {
   }
   else if (sensorEsq > limitePreto && sensorDir <= limitePreto) {
     // Virar à esquerda - reduzir velocidade do motor esquerdo
-    moverFrente(0, velocidadeBase);
+    moverFrente(0, velocidadeMaxima);
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
-    moverFrente(velocidadeBase, 0);
+    moverFrente(velocidadeMaxima, 0);
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto && sensorMeio > limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
-    moverFrente(velocidadeMaxima, 0);
+    moverFrente(velocidadeBase, 0);
   }
   else if (sensorDir <= limitePreto && sensorEsq > limitePreto && sensorMeio > limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
-    moverFrente(velocidadeMaxima, 0);
+    moverFrente(velocidadeBase, 0);
   }
   else if (sensorMeio > limitePreto && sensorEsq > limitePreto && sensorDir > limitePreto) {
     // Fim do percurso - parar o carrinho

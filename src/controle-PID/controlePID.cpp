@@ -1,9 +1,9 @@
 #include <Arduino.h>
 
 // Definição de pinos dos sensores, eoconders e motores 
-const int pinSensorEsq = 15;
+const int pinSensorEsq = ;
 const int pinSensorMeio = 2;
-const int pinSensorDir = 4;
+const int pinSensorDir = ;
 
 const int pinEncoderEsq = ;
 const int pinEncoderDir = ;
@@ -16,9 +16,6 @@ int sensorEsq;
 int sensorMeio;
 int sensorDir;
 
-int encoderEsq;
-int encoderDir;
-
 // Variáveis para controle PID
 float erro;
 float proporcional;
@@ -29,6 +26,7 @@ float Kp = 0.0;
 float Ki = 0.0;
 float Kd = 0.0;
 float PID;
+float baseSpeed = 80.0;
 
 // Funções
 int lerSensor(int sensorPin) {
@@ -53,7 +51,17 @@ float calcularErro(int sensorEsq, int sensorMeio, int sensorDir) {
   }
 }
 
-void controlarMotor() {}
+void controlarMotor() {
+     // Calcular velocidade dos motores
+    int speedA = baseSpeed + correction;
+    int speedB = baseSpeed - correction;
+
+    // Limitar a velocidade dos motores
+    speedA = constrain(speedA, 0, 100);
+    speedB = constrain(speedB, 0, 100);
+
+
+}
 
 void controlePID() {
   sensorEsq = lerSensor(pinSensorEsq);
@@ -80,6 +88,8 @@ void controlePID() {
 
   PID = (Kp*proporcional) + (Ki*integral) + (Kd*derivativo);
   erroAnterior = erro;
+
+  return PID;
 }
 
 void setup() {
