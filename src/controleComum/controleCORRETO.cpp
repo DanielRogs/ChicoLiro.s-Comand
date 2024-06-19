@@ -31,7 +31,7 @@
 const int velocidadeBase = 80; // Velocidade base dos motores
 const int velocidadeMaxima = 100; // Velocidade máxima dos motores
 const int ajusteVelocidade = 10; // Ajuste de velocidade para correções
-const int limitePreto = 110; // Valor limite para detectar a linha preta (ajuste conforme necessário)
+const int limitePreto = 80; // Valor limite para detectar a linha preta (ajuste conforme necessário)
 
 void setup() {
   // Configuração dos pinos dos motores

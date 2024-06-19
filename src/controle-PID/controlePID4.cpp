@@ -20,8 +20,8 @@
 #define EN_B 25
 
 // Conexões dos sensores infravermelhos (Portas analógicas)
-#define pinSensorMeio 14
-#define pinSensorEsq 2
+#define pinSensorMeio 2
+#define pinSensorEsq 15
 #define pinSensorDir 4
 
 // Conexões dos encoders
@@ -29,9 +29,9 @@
 #define encB 23
 
 // Variáveis de controle de velocidade
-const int velocidadeBase = 50; // Velocidade base dos motores
+const int velocidadeBase = 80; // Velocidade base dos motores
 const int velocidadeMaxima = 100; // Velocidade máxima dos motores
-const int limitePreto = 500; // Valor limite para detectar a linha preta (ajuste conforme necessário)
+const int limitePreto = 80; // Valor limite para detectar a linha preta (ajuste conforme necessário)
 
 // Variáveis PID
 float kp = 1.0; // Ganho proporcional
