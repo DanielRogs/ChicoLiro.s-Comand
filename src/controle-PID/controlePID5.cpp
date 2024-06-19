@@ -100,7 +100,7 @@ int calcularPID(int erro) {
 }
 
 void controlarMotor(float valuePID) {
-  if (valuePID>0) {
+  if (valuePID > 0) {
   // Direita
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);

@@ -28,10 +28,10 @@
 #define pinSensorDir 4
 
 // Variáveis de controle de velocidade
-const int velocidadeBase = 70; // Velocidade base dos motores
-const int velocidadeMaxima = 90; // Velocidade máxima dos motores
-const int ajusteVelocidade = 5; // Ajuste de velocidade para correções
-const int limitePreto = 70; // Valor limite para detectar a linha preta (ajuste conforme necessário)
+const int velocidadeBase = 50; // Velocidade base dos motores
+const int velocidadeMaxima = 80; // Velocidade máxima dos motores
+const int ajusteVelocidade = 15; // Ajuste de velocidade para correções
+const int limitePreto =80; // Valor limite para detectar a linha preta (ajuste conforme necessário)
 
 void setup() {
   // Configuração dos pinos dos motores
@@ -69,23 +69,58 @@ void loop() {
 
  if (sensorMeio > limitePreto && sensorEsq <= limitePreto && sensorDir <= limitePreto) {
     // Linha reta - ambos os motores com velocidade base
-    moverFrente(velocidadeBase, velocidadeBase);
+    // moverFrente(velocidadeBase, velocidadeBase);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    analogWrite(EN_A, velocidadeBase);
+
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    analogWrite(EN_B, velocidadeBase);
   }
   else if (sensorEsq > limitePreto && sensorDir <= limitePreto) {
     // Virar à esquerda - reduzir velocidade do motor esquerdo
-    moverFrente(0, velocidadeMaxima);
+    // moverFrente(0, velocidadeMaxima);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(EN_A, velocidadeMaxima - ajusteVelocidade);
+
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    analogWrite(EN_B, velocidadeMaxima);
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
-    moverFrente(velocidadeMaxima, 0);
+    // moverFrente(velocidadeMaxima, 0);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    analogWrite(EN_A, velocidadeMaxima);
+
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    analogWrite(EN_B, velocidadeMaxima - ajusteVelocidade);
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto && sensorMeio > limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
-    moverFrente(velocidadeBase, 0);
+    // moverFrente(velocidadeBase, 0);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    analogWrite(EN_A, velocidadeBase);
+
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    analogWrite(EN_B, velocidadeBase - ajusteVelocidade);
   }
   else if (sensorDir <= limitePreto && sensorEsq > limitePreto && sensorMeio > limitePreto) {
-    // Virar à direita - reduzir velocidade do motor direito
-    moverFrente(0, velocidadeBase);
+    // Virar à direita - reduzir velocidade do motor esquerdo
+    // moverFrente(0, velocidadeBase);
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(EN_A, velocidadeBase - ajusteVelocidade);
+
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    analogWrite(EN_B, velocidadeBase);
   }
   else if (sensorMeio > limitePreto && sensorEsq > limitePreto && sensorDir > limitePreto) {
     // Fim do percurso - parar o carrinho
@@ -133,7 +168,7 @@ void moverFrente(int velocidadeA, int velocidadeB) {
   analogWrite(EN_B, velocidadeB);
 }
 
-// Função para parar os motores
+// Função para parar os motore100s
 void pararMotores() {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
