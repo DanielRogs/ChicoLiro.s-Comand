@@ -10,14 +10,14 @@
 
 #include <Arduino.h>
 
-// Motor A
+// Motor A - CORRIGIR
 #define IN1 12 // Os pinos com o prefixo "IN" são pinos da Ponte H que determinam as entradas nos terminais dos motores, e consequentemente,
 #define IN2 14 // a direção de rotação deles
 #define EN_A 13 // Os pinos com o prefixo "EN" são pinos da Ponte H que vão determinar quanto de tensão os motores irão receber, assim determi-
                 // nando a velocidade com a qual eles vão girar. Esses pinos irão receber um sinal PWM, que é um sinal digital que emula um
                 // sinal analógico
 
-// Motor B
+// Motor B - CORRIGIR
 #define IN3 27
 #define IN4 26
 #define EN_B 25
