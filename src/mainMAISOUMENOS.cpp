@@ -9,6 +9,9 @@
 // Conexões do motor (Os pinos de Enable EN_A e EN_B devem ser pinos de PWM para podermos controlar a velocidade dos motores)
 
 #include <Arduino.h>
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+#include <HTTPClient.h>
 
 // Motor A - CORRIGIR
 #define IN1 12  // Os pinos com o prefixo "IN" são pinos da Ponte H que determinam as entradas nos terminais dos motores, e consequentemente,
@@ -22,18 +25,55 @@
 #define IN4 26
 #define EN_B 25
 
+
 // Conexões do infravermelho
 #define pinSensorMeio 2
 #define pinSensorEsq 15
 #define pinSensorDir 4
 
+// Definindo as credenciais WiFi
+const char* ssid = "iPhone de Alana";
+const char* wifi_password = "alanaaa123";
+
+// Definindo o URL do servidor para onde os dados serão enviados
+const char* serverUrl = "https://chicoliro.xobengala.com.br/api/dados/receive-data";
+
+// Criando uma instância do servidor
+AsyncWebServer server(80);
+
 // Variáveis de controle de velocidade
 const int velocidadeBase = 75; // Velocidade base dos motores
 const int velocidadeMaxima = 90; // Velocidade máxima dos motores
 const int ajusteVelocidade = 5; // Ajuste de velocidade para correções
-const int limitePreto =50; // Valor limite para detectar a linha preta (ajuste conforme necessário)
+const int limitePreto = 50; // Valor limite para detectar a linha preta (ajuste conforme necessário)
+
+volatile bool isMoving = false;
+
+void enviarDados() {
+    HTTPClient http;
+    http.begin(serverUrl);
+    http.addHeader("Content-Type", "application/json");
+    
+    String jsonData = "{\"rpmMotorDir\": " + String(200) +
+                      ", \"rpmMotorEsq\": " + String(4000) +
+                      ", \"tensao\": " + String(9) +
+                      ", \"isMoving\": " + String(isMoving) + "}"; 
+
+    int httpResponseCode = http.POST(jsonData);
+    // Serial.println(jsonData);
+    // Serial.println(httpResponseCode);
+
+    // if (httpResponseCode >= 200 && httpResponseCode < 400) {
+    //     Serial.println("Dados enviados com sucesso");
+    // } else {
+    //     Serial.println("Falha ao enviar dados");
+    // }
+
+    http.end();
+}
 
 void setup() {
+
   // Configuração dos pinos dos motores
   pinMode(EN_A, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -59,6 +99,24 @@ void setup() {
                         // 255 significa 12v e o motor aguenta até 6v
 
   Serial.begin(9600);
+
+    // Conecte-se ao WiFi
+    WiFi.begin(ssid, wifi_password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(1000);
+        // Serial.println("Conectando ao WiFi...");
+    }
+    // Serial.println("Conectado ao WiFi");
+
+    // Inicie o servidor
+    server.begin();
+
+    xTaskCreate([](void*){
+        for (;;) {
+            enviarDados();
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+        }
+    }, "EnviarDadosTask", 4096, NULL, 1, NULL);
 }
 
 void loop() {
@@ -77,6 +135,8 @@ void loop() {
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
     analogWrite(EN_B, velocidadeBase);
+    isMoving = true;
+    // enviarDados();
   }
   else if (sensorEsq > limitePreto && sensorDir <= limitePreto) {
     // Virar à esquerda - reduzir velocidade do motor esquerdo
@@ -88,6 +148,8 @@ void loop() {
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
     analogWrite(EN_B, velocidadeMaxima);
+    isMoving = true;
+    // enviarDados();
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
@@ -99,6 +161,8 @@ void loop() {
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
     analogWrite(EN_B, velocidadeMaxima - ajusteVelocidade);
+    isMoving = true;
+    // enviarDados();
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto && sensorMeio > limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
@@ -110,6 +174,8 @@ void loop() {
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
     analogWrite(EN_B, velocidadeBase - ajusteVelocidade);
+    isMoving = true;
+    // enviarDados();
   }
   else if (sensorDir <= limitePreto && sensorEsq > limitePreto && sensorMeio > limitePreto) {
     // Virar à direita - reduzir velocidade do motor esquerdo
@@ -121,14 +187,20 @@ void loop() {
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
     analogWrite(EN_B, velocidadeBase);
+    isMoving = true;
+    // enviarDados();
   }
   else if (sensorMeio > limitePreto && sensorEsq > limitePreto && sensorDir > limitePreto) {
     // Fim do percurso - parar o carrinho
+    isMoving = false;
     pararMotores();
+    // enviarDados();
   }
   else {
     // Não detectado - parar o carrinho
     moverFrente(velocidadeBase - ajusteVelocidade, velocidadeBase - ajusteVelocidade);
+    isMoving = true;
+    // enviarDados();
   }
 
   // Serial.println(sensorMeio);
