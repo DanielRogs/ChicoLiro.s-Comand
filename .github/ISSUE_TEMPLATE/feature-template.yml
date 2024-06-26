@@ -1,0 +1,38 @@
+name: New Feature
+description: Register a new Feature in the ChicoLiro Project
+title: "[FEATURE]: <Título da Feature no verbo Infinitivo>"
+labels: ["FEAT", "DevOps"]
+projects: ["pi1-2024-ChicoLiro/ChicoLiro-Board"]
+body:
+  - type: textarea
+    id: text-zone1
+    attributes:
+      label: Descreva a Feature
+      description: Forneça detalhes de o que é tal feature
+      placeholder: Escreva aqui...
+    validations:
+      required: true
+  - type: textarea
+    id: text-zone2
+    attributes:
+      label: Como isso irá beneficiar o projeto?
+      description: O que deve ser testado e estando funcionando para que se conclúa a atividade?
+      placeholder: Escreva aqui... 
+    validations:
+      required: true
+  - type: textarea
+    id: text-zone3
+    attributes:
+      label: Quais os critérios de Aceitação?
+      description: Diga alguns critérios de aceitação para que a feature esteja contemplada no projeto.
+      value: |
+        - [ ] Critério 1;
+        - [ ] Critério 2.
+    validations:
+      required: true
+  - type: textarea
+    id: text-zone4
+    attributes:
+      label: Mais algum detalhe?
+      description: Escreva detalhes que sejam pertinentes ou úteis ao time de desenvolvedores.
+      placeholder: Escreva ou deixe em branco.
