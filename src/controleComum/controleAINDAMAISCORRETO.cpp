@@ -31,9 +31,13 @@
 const int velocidadeBase = 75; // Velocidade base dos motores
 const int velocidadeMaxima = 90; // Velocidade máxima dos motores
 const int ajusteVelocidade = 5; // Ajuste de velocidade para correções
-const int limitePreto =50; // Valor limite para detectar a linha preta (ajuste conforme necessário)
-const int limitePerdido = 80;
+int limitePreto =50; // Valor limite para detectar a linha preta (ajuste conforme necessário)
+const int limitePerdido = 20000;
 int tempoPerdido = 0;
+
+// Variáveis para calibração
+int sensorMin = 1023;
+int sensorMax = 0;
 
 void setup() {
   // Configuração dos pinos dos motores
@@ -61,6 +65,8 @@ void setup() {
                         // 255 significa 12v e o motor aguenta até 6v
 
   Serial.begin(9600);
+
+  calibrarSensores();
 }
 
 void loop() {
@@ -185,17 +191,6 @@ aos IN1, IN2, IN3, IN4.
 
 */
 
-// Função para mover o carrinho para frente com controle de velocidade
-void moverFrente(int velocidadeA, int velocidadeB) {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  analogWrite(EN_A, velocidadeA);
-
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-  analogWrite(EN_B, velocidadeB);
-}
-
 // Função para parar os motore100s
 void pararMotores() {
   digitalWrite(IN1, LOW);
@@ -205,4 +200,64 @@ void pararMotores() {
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, LOW);
   analogWrite(EN_B, 0);
+}
+
+void calibrarSensores() {
+
+  for (int i = 0; i < 50; i++) {
+    // Leitura dos sensores
+    int sensorMeio = analogRead(pinSensorMeio);
+    int sensorEsq = analogRead(pinSensorEsq);
+    int sensorDir = analogRead(pinSensorDir);
+
+    if (sensorMeio < sensorMin) sensorMin = sensorMeio;
+    if (sensorEsq < sensorMin) sensorMin = sensorEsq;
+    if (sensorDir < sensorMin) sensorMin = sensorDir;
+
+    if (sensorMeio > sensorMax) sensorMax = sensorMeio;
+    if (sensorEsq > sensorMax) sensorMax = sensorEsq;
+    if (sensorDir > sensorMax) sensorMax = sensorDir;
+
+    // Movendo ligeiramente para a direita
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, HIGH);
+    analogWrite(EN_A, velocidadeBase - ajusteVelocidade);
+
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
+    analogWrite(EN_B, velocidadeBase - ajusteVelocidade);
+
+    delay(10);
+  }
+
+  for (int i = 0; i < 50; i++) {
+    // Leitura dos sensores
+    int sensorMeio = analogRead(pinSensorMeio);
+    int sensorEsq = analogRead(pinSensorEsq);
+    int sensorDir = analogRead(pinSensorDir);
+
+    if (sensorMeio < sensorMin) sensorMin = sensorMeio;
+    if (sensorEsq < sensorMin) sensorMin = sensorEsq;
+    if (sensorDir < sensorMin) sensorMin = sensorDir;
+
+    if (sensorMeio > sensorMax) sensorMax = sensorMeio;
+    if (sensorEsq > sensorMax) sensorMax = sensorEsq;
+    if (sensorDir > sensorMax) sensorMax = sensorDir;
+
+    // Movendo ligeiramente para a esquerda
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    analogWrite(EN_A, velocidadeBase - ajusteVelocidade);
+
+    digitalWrite(IN3, HIGH);
+    digitalWrite(IN4, LOW);
+    analogWrite(EN_B, velocidadeBase - ajusteVelocidade);
+
+    delay(10);
+  }
+
+  // Ajusta o limite para o valor médio entre o mínimo e o máximo
+  limitePreto = (sensorMin + sensorMax) / 2;
+
+  delay(1000); // Espera um pouco antes de iniciar o loop principal
 }

@@ -1,7 +1,6 @@
 /*
   Título: SISTEMA CONTROLADOR DO CARRINHO
   Autores: Daniel Rodrigues da Rocha, Leandro de Almeida
-  Autores: Daniel Rodrigues da Rocha, Leandro de Almeida
   Descrição: Código para controlar um carrinho seguidor de linha utilizando sensores infravermelhos e controle PWM.
   Data de criação: 19/06/2024
 */
@@ -10,6 +9,8 @@
 // Conexões do motor (Os pinos de Enable EN_A e EN_B devem ser pinos de PWM para podermos controlar a velocidade dos motores)
 
 #include <Arduino.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
 
 // Motor A - CORRIGIR
 #define IN1 12  // Os pinos com o prefixo "IN" são pinos da Ponte H que determinam as entradas nos terminais dos motores, e consequentemente,
@@ -33,8 +34,17 @@ const int velocidadeBase = 75; // Velocidade base dos motores
 const int velocidadeMaxima = 90; // Velocidade máxima dos motores
 const int ajusteVelocidade = 5; // Ajuste de velocidade para correções
 const int limitePreto =50; // Valor limite para detectar a linha preta (ajuste conforme necessário)
-const int limitePerdido = 80;
+const int limitePerdido = 20000;
 int tempoPerdido = 0;
+
+const char* ssid = "SEU_SSID";
+const char* password = "SUA_SENHA";
+const char* serverUrl = "https://chicoliro.xobengala.com.br/api/dados/receive-data";
+
+unsigned long lastTime = 0;
+unsigned long timerDelay = 5000;  // Intervalo de tempo para envio de dados (5 segundos)
+unsigned long wifiCheckInterval = 10000;  // Intervalo de tempo para verificar o WiFi (10 segundos)
+unsigned long lastWifiCheckTime = 0;
 
 void setup() {
   // Configuração dos pinos dos motores
@@ -60,12 +70,9 @@ void setup() {
   analogWrite(EN_A, 0); // Os pinos de saída analógicos do Arduino tem 8 bits de definição, logo variam entre 0 e 255 (2^8 = 256)
   analogWrite(EN_B, 0); // Mas no caso do motor, ela só pode variar de 0 até 100, pois se não, ele QUEIMA. Isso porque o que tá sendo controlado é a tensao.
                         // 255 significa 12v e o motor aguenta até 6v
-// Esses pinos abaixo determinam a velocidade na ponte H
-  analogWrite(EN_A, 0); // Os pinos de saída analógicos do Arduino tem 8 bits de definição, logo variam entre 0 e 255 (2^8 = 256)
-  analogWrite(EN_B, 0); // Mas no caso do motor, ela só pode variar de 0 até 100, pois se não, ele QUEIMA. Isso porque o que tá sendo controlado é a tensao.
-                        // 255 significa 12v e o motor aguenta até 6v
 
   Serial.begin(9600);
+  conectarWiFi();
 }
 
 void loop() {
@@ -74,7 +81,18 @@ void loop() {
   int sensorEsq = analogRead(pinSensorEsq);
   int sensorDir = analogRead(pinSensorDir);
 
- if (sensorMeio > limitePreto && sensorEsq <= limitePreto && sensorDir <= limitePreto) {
+  if (millis() - lastTime > timerDelay) {
+    enviarDados();
+    lastTime = millis();
+  }
+
+  if (millis() - lastWifiCheckTime > wifiCheckInterval) {
+    if (WiFi.status() != WL_CONNECTED) {
+      conectarWiFi();
+    }
+    lastWifiCheckTime = millis();
+  }
+
  if (sensorMeio > limitePreto && sensorEsq <= limitePreto && sensorDir <= limitePreto) {
     // Linha reta - ambos os motores com velocidade base
     // moverFrente(velocidadeBase, velocidadeBase);
@@ -85,7 +103,6 @@ void loop() {
     digitalWrite(IN3, HIGH);
     digitalWrite(IN4, LOW);
     analogWrite(EN_B, velocidadeBase);
-    tempoPerdido = 0;
     tempoPerdido = 0;
   }
   else if (sensorEsq > limitePreto && sensorDir <= limitePreto) {
@@ -99,7 +116,6 @@ void loop() {
     digitalWrite(IN4, LOW);
     analogWrite(EN_B, velocidadeMaxima);
     tempoPerdido = 0;
-    tempoPerdido = 0;
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto) {
     // Virar à direita - reduzir velocidade do motor direito
@@ -111,7 +127,6 @@ void loop() {
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, HIGH);
     analogWrite(EN_B, velocidadeMaxima - ajusteVelocidade);
-    tempoPerdido = 0;
     tempoPerdido = 0;
   }
   else if (sensorDir > limitePreto && sensorEsq <= limitePreto && sensorMeio > limitePreto) {
@@ -125,7 +140,6 @@ void loop() {
     digitalWrite(IN4, HIGH);
     analogWrite(EN_B, velocidadeBase - ajusteVelocidade);
     tempoPerdido = 0;
-    tempoPerdido = 0;
   }
   else if (sensorDir <= limitePreto && sensorEsq > limitePreto && sensorMeio > limitePreto) {
     // Virar à direita - reduzir velocidade do motor esquerdo
@@ -138,12 +152,10 @@ void loop() {
     digitalWrite(IN4, LOW);
     analogWrite(EN_B, velocidadeBase);
     tempoPerdido = 0;
-    tempoPerdido = 0;
   }
   else if (sensorMeio > limitePreto && sensorEsq > limitePreto && sensorDir > limitePreto) {
     // Fim do percurso - parar o carrinho
     pararMotores();
-    tempoPerdido = 0;
     tempoPerdido = 0;
   }
   else {
@@ -197,17 +209,6 @@ aos IN1, IN2, IN3, IN4.
 
 */
 
-// Função para mover o carrinho para frente com controle de velocidade
-void moverFrente(int velocidadeA, int velocidadeB) {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  analogWrite(EN_A, velocidadeA);
-
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-  analogWrite(EN_B, velocidadeB);
-}
-
 // Função para parar os motore100s
 void pararMotores() {
   digitalWrite(IN1, LOW);
@@ -217,4 +218,30 @@ void pararMotores() {
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, LOW);
   analogWrite(EN_B, 0);
+}
+
+void enviarDados() {
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(serverUrl);
+
+      http.addHeader("Content-Type", "application/json");
+
+      String jsonData = "{\"rpmMotorDir\": " + String(200) +
+                      ", \"rpmMotorEsq\": " + String(400) +
+                      ", \"tensao\": " + String(9) +
+                      ", \"isMoving\": " + String(true) + "}";
+      int httpResponseCode = http.POST(jsonData);
+
+      http.end();
+  }
+}
+
+void conectarWiFi() {
+  WiFi.begin(ssid, password);
+
+  unsigned long startTime = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {  // Tenta conectar por 10 segundos
+    delay(500);
+  }
 }
