@@ -9,6 +9,8 @@
 // Conexões do motor (Os pinos de Enable EN_A e EN_B devem ser pinos de PWM para podermos controlar a velocidade dos motores)
 
 #include <Arduino.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
 
 // Motor A - CORRIGIR
 #define IN1 12  // Os pinos com o prefixo "IN" são pinos da Ponte H que determinam as entradas nos terminais dos motores, e consequentemente,
@@ -32,8 +34,17 @@ const int velocidadeBase = 75; // Velocidade base dos motores
 const int velocidadeMaxima = 90; // Velocidade máxima dos motores
 const int ajusteVelocidade = 5; // Ajuste de velocidade para correções
 const int limitePreto =50; // Valor limite para detectar a linha preta (ajuste conforme necessário)
-const int limitePerdido = 20000;
+const int limitePerdido = 80;
 int tempoPerdido = 0;
+
+const char* ssid = "SEU_SSID";
+const char* password = "SUA_SENHA";
+const char* serverUrl = "https://chicoliro.xobengala.com.br/api/dados/receive-data";
+
+unsigned long lastTime = 0;
+unsigned long timerDelay = 5000;  // Intervalo de tempo para envio de dados (5 segundos)
+unsigned long wifiCheckInterval = 10000;  // Intervalo de tempo para verificar o WiFi (10 segundos)
+unsigned long lastWifiCheckTime = 0;
 
 void setup() {
   // Configuração dos pinos dos motores
@@ -61,6 +72,7 @@ void setup() {
                         // 255 significa 12v e o motor aguenta até 6v
 
   Serial.begin(9600);
+  conectarWiFi();
 }
 
 void loop() {
@@ -68,6 +80,18 @@ void loop() {
   int sensorMeio = analogRead(pinSensorMeio);
   int sensorEsq = analogRead(pinSensorEsq);
   int sensorDir = analogRead(pinSensorDir);
+
+  if (millis() - lastTime > timerDelay) {
+    enviarDados();
+    lastTime = millis();
+  }
+
+  if (millis() - lastWifiCheckTime > wifiCheckInterval) {
+    if (WiFi.status() != WL_CONNECTED) {
+      conectarWiFi();
+    }
+    lastWifiCheckTime = millis();
+  }
 
  if (sensorMeio > limitePreto && sensorEsq <= limitePreto && sensorDir <= limitePreto) {
     // Linha reta - ambos os motores com velocidade base
@@ -194,4 +218,29 @@ void pararMotores() {
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, LOW);
   analogWrite(EN_B, 0);
+}
+
+void enviarDados() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(serverUrl);
+
+    http.addHeader("Content-Type", "application/json");
+
+    String jsonData = "{\"rpmMotorDir\": " + String(200) +
+                    ", \"rpmMotorEsq\": " + String(400) +
+                    ", \"tensao\": " + String(9) +
+                    ", \"isMoving\": " + String(true) + "}";
+    int httpResponseCode = http.POST(jsonData);
+
+    http.end();
+}
+
+void conectarWiFi() {
+  WiFi.begin(ssid, password);
+
+  unsigned long startTime = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {  // Tenta conectar por 10 segundos
+    delay(500);
+  }
 }
