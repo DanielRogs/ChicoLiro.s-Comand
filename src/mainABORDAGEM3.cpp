@@ -34,7 +34,7 @@ const int velocidadeBase = 75; // Velocidade base dos motores
 const int velocidadeMaxima = 90; // Velocidade máxima dos motores
 const int ajusteVelocidade = 5; // Ajuste de velocidade para correções
 const int limitePreto =50; // Valor limite para detectar a linha preta (ajuste conforme necessário)
-const int limitePerdido = 80;
+const int limitePerdido = 20000;
 int tempoPerdido = 0;
 
 const char* ssid = "SEU_SSID";
@@ -221,19 +221,20 @@ void pararMotores() {
 }
 
 void enviarDados() {
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(serverUrl);
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(serverUrl);
 
-    http.addHeader("Content-Type", "application/json");
+      http.addHeader("Content-Type", "application/json");
 
-    String jsonData = "{\"rpmMotorDir\": " + String(200) +
-                    ", \"rpmMotorEsq\": " + String(400) +
-                    ", \"tensao\": " + String(9) +
-                    ", \"isMoving\": " + String(true) + "}";
-    int httpResponseCode = http.POST(jsonData);
+      String jsonData = "{\"rpmMotorDir\": " + String(200) +
+                      ", \"rpmMotorEsq\": " + String(400) +
+                      ", \"tensao\": " + String(9) +
+                      ", \"isMoving\": " + String(true) + "}";
+      int httpResponseCode = http.POST(jsonData);
 
-    http.end();
+      http.end();
+  }
 }
 
 void conectarWiFi() {
